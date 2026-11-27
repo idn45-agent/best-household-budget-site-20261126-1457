@@ -1,5 +1,6 @@
 // Titik masuk situs: router hash + semua aksi pengguna.
-// Rute: #/ dasbor, #/anggaran, #/transaksi, #/kategori/<id>, #/tujuan, #/laporan.
+// Rute: #/ dasbor, #/anggaran, #/transaksi, #/kategori (daftar),
+// #/kategori/<id> (rincian), #/tujuan, #/laporan.
 // Aksi (delegasi klik/submit di document): ganti bulan, tambah/hapus transaksi,
 // simpan pagu, tambah dana tujuan, muat ulang data contoh.
 
@@ -14,6 +15,7 @@ import {
   afterDashboard,
   afterReport,
   viewBudget,
+  viewCategories,
   viewCategory,
   viewDashboard,
   viewGoals,
@@ -38,6 +40,8 @@ function route() {
     html = viewTransactions(state);
   } else if (parts[0] === 'kategori' && parts[1]) {
     html = viewCategory(state, parts[1]);
+  } else if (parts[0] === 'kategori') {
+    html = viewCategories(state);
   } else if (parts[0] === 'tujuan') {
     html = viewGoals(state);
   } else if (parts[0] === 'laporan') {

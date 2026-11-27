@@ -1,4 +1,4 @@
-// DompetKita — program penyerahan (Node 22, standard library only).
+// DompetKita v2 — program penyerahan (Node 22, standard library only).
 // Situsnya file statis di app/ (index.html + ES module + CSS, tanpa build step,
 // tanpa request jaringan). Program ini menyalin app/ dan screenshots/ dari
 // sebelah file ini ke /output lalu menulis /output/dossier.json — ringkasan

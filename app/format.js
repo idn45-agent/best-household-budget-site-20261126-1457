@@ -6,7 +6,7 @@ const RUPIAH = new Intl.NumberFormat('id-ID', {
   maximumFractionDigits: 0,
 });
 
-// Rp22.250.000
+// Rp22.250.000 (Intl memakai spasi non-breaking setelah "Rp")
 export function rupiah(n) {
   return RUPIAH.format(Math.round(n));
 }
@@ -33,6 +33,20 @@ export function tanggalSingkat(iso) {
 // 0,63 -> "63%"
 export function persen(v) {
   return Math.round(v * 100) + '%';
+}
+
+// Selisih relatif: 0,242 -> "+24%" ; -0,311 -> "−31%"
+// Nol mutlak -> "0%".
+export function deltaPersen(v) {
+  if (!Number.isFinite(v) || v === 0) return '0%';
+  const sign = v > 0 ? '+' : '−';
+  return sign + Math.round(Math.abs(v) * 100) + '%';
+}
+
+// Selisih rupiah dengan tanda: +Rp320.000 / −Rp190.000
+export function deltaRupiah(v) {
+  if (v === 0) return 'Rp0';
+  return (v > 0 ? '+' : '−') + rupiah(Math.abs(v));
 }
 
 // Escape teks pengguna sebelum dimasukkan ke HTML.

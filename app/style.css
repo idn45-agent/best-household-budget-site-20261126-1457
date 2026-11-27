@@ -1,36 +1,45 @@
-/* DompetKita — gaya asli: krem hangat, hijau tua, aksen kuning kunyit. */
+/* DompetKita v2 — gaya baru: kertas hangat, hijau zamrud, aksen kuning kunyit.
+   Hierarki lebih tegas: angka besar bertabung, kartu ringkasan empat kolom,
+   strip peringatan, lencana status pagu, dan kartu kategori. */
 * { box-sizing: border-box; }
 :root {
-  --green: #1d5c3f;
-  --green-dark: #123f2b;
-  --cream: #f7f3ea;
+  --green: #0e5e3f;
+  --green-deep: #0a4530;
+  --paper: #faf6ee;
   --card: #ffffff;
-  --ink: #1f2937;
+  --ink: #1b2a22;
   --muted: #6b7280;
-  --line: #e5ddcb;
-  --amber: #b45309;
-  --red: #b91c1c;
-  --good: #2e7d4f;
+  --line: #e7e0d2;
+  --amber: #e9a13b;
+  --amber-soft: #fdf3e0;
+  --red: #c2410c;
+  --red-soft: #fdeee7;
+  --good: #0e5e3f;
+  --good-soft: #e3f0e8;
 }
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  background: var(--cream);
+  background: var(--paper);
   color: var(--ink);
   font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
 a { color: var(--green); }
-h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -0.02em; }
-h2 { font-size: 18px; margin: 0 0 12px; }
+h1 { font-size: 30px; margin: 0 0 4px; letter-spacing: -0.02em; line-height: 1.15; }
+h2 { font-size: 18px; margin: 0 0 12px; letter-spacing: -0.01em; }
 h3 { font-size: 16px; margin: 20px 0 8px; }
+.eyebrow {
+  margin: 0 0 2px; font-size: 12px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.09em; color: var(--green);
+}
 
 /* Header */
-.top { background: var(--green-dark); color: #fff; }
+.top { background: var(--green-deep); color: #fff; }
 .top-in { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 12px; padding-bottom: 12px; flex-wrap: wrap; }
 .brand { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; }
 .brand .logo {
-  width: 40px; height: 40px; border-radius: 10px; background: #e8a33d; color: #123f2b;
+  width: 42px; height: 42px; border-radius: 11px; background: var(--amber); color: var(--green-deep);
   display: inline-flex; align-items: center; justify-content: center;
   font-weight: 800; font-size: 18px;
 }
@@ -41,7 +50,7 @@ nav a {
   color: #dbeadf; text-decoration: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; font-size: 15px;
 }
 nav a:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
-nav a.active { background: #e8a33d; color: #123f2b; }
+nav a.active { background: var(--amber); color: var(--green-deep); }
 
 /* Hero + month nav */
 .hero { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; padding: 28px 0 16px; flex-wrap: wrap; }
@@ -54,23 +63,40 @@ nav a.active { background: #e8a33d; color: #123f2b; }
 }
 .mn-btn.disabled { color: #9ca3af; }
 
+/* Strip peringatan pagu */
+.alert {
+  background: var(--red-soft); border: 1px solid #f3c9b8; border-radius: 12px;
+  padding: 12px 16px; margin-bottom: 16px; font-size: 14.5px; line-height: 1.5;
+}
+.alert strong { color: var(--red); }
+
 /* Cards */
 .card {
-  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
   padding: 18px 20px; margin-bottom: 18px;
 }
-.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
-.card.sum strong { display: block; font-size: 26px; letter-spacing: -0.02em; margin: 2px 0; }
-.lbl { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+.card.sum strong { display: block; font-size: 27px; letter-spacing: -0.02em; margin: 2px 0; font-variant-numeric: tabular-nums; }
+.lbl { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
 .card.sum .note { font-size: 13px; color: var(--muted); }
 .card.sum.in strong { color: var(--good); }
 .card.sum.out strong { color: var(--red); }
 .card.sum.rest strong { color: var(--green); }
+.card.sum.rate strong { color: #8a6d00; }
 .grid2 { display: grid; grid-template-columns: 1.15fr 1fr; gap: 14px; }
 .grid2 .card { margin-bottom: 14px; }
 .hint { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
 .more { margin: 12px 0 0; font-size: 14px; }
 .empty { color: var(--muted); }
+
+/* Lencana status pagu */
+.badge {
+  display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 9px;
+  border-radius: 999px; white-space: nowrap; vertical-align: middle;
+}
+.badge.ok { background: var(--good-soft); color: var(--good); }
+.badge.warn { background: var(--amber-soft); color: #8a5a00; }
+.badge.bad { background: var(--red-soft); color: var(--red); }
 
 /* Budget rows (dasbor) */
 .budget-row {
@@ -83,6 +109,7 @@ nav a.active { background: #e8a33d; color: #123f2b; }
 .bnums { font-size: 13px; color: var(--muted); text-align: right; white-space: nowrap; }
 .budget-row .bar { grid-column: 2; }
 .budget-row .bpct { grid-column: 3; grid-row: 2; }
+.budget-row .badge { grid-column: 3; grid-row: 1; justify-self: end; }
 .bpct { font-size: 13px; font-weight: 700; text-align: right; white-space: nowrap; }
 .chip {
   width: 28px; height: 28px; border-radius: 8px; color: #fff; font-size: 11px; font-weight: 800;
@@ -91,9 +118,20 @@ nav a.active { background: #e8a33d; color: #123f2b; }
 h1 .chip { width: 34px; height: 34px; font-size: 13px; }
 
 /* Progress bars */
-.bar { height: 10px; background: #eee8d8; border-radius: 6px; overflow: hidden; }
+.bar { height: 10px; background: #ece5d3; border-radius: 6px; overflow: hidden; }
 .bar-fill { height: 100%; background: var(--green); border-radius: 6px; }
 .bar-fill.over { background: var(--red); }
+
+/* Wawasan */
+.insights { list-style: none; margin: 0; padding: 0; }
+.insights li { padding: 9px 0 9px 26px; border-bottom: 1px solid #f0ebdd; position: relative; font-size: 14.5px; }
+.insights li:last-child { border-bottom: 0; }
+.insights li::before {
+  content: ""; position: absolute; left: 2px; top: 14px; width: 12px; height: 12px; border-radius: 50%;
+}
+.insights li.warn::before { background: var(--red); }
+.insights li.good::before { background: var(--good); }
+.insights li.info::before { background: var(--amber); }
 
 /* Tables */
 table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
@@ -115,7 +153,7 @@ tr.total td { border-top: 2px solid var(--line); }
   background: var(--green); color: #fff; border: 0; border-radius: 9px;
   padding: 10px 18px; font: 600 15px system-ui, sans-serif; cursor: pointer;
 }
-.btn:hover { background: var(--green-dark); }
+.btn:hover { background: var(--green-deep); }
 .btn.small { padding: 7px 12px; font-size: 14px; }
 .del { background: none; border: 0; color: #9ca3af; cursor: pointer; font-size: 13px; padding: 4px 6px; }
 .del:hover { color: var(--red); text-decoration: underline; }
@@ -132,11 +170,23 @@ tr.total td { border-top: 2px solid var(--line); }
 .filters { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
 .filters label { font-size: 13px; font-weight: 600; color: var(--muted); display: flex; gap: 6px; align-items: center; }
 
+/* Kartu kategori (halaman #/kategori) */
+.catgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+.catcard { display: block; text-decoration: none; color: inherit; margin-bottom: 0; }
+.catcard:hover { border-color: var(--green); }
+.catcard .chip { margin-bottom: 10px; }
+.catcard-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.catcard-top strong { font-size: 17px; }
+.catcard-nums { display: flex; justify-content: space-between; align-items: baseline; margin: 10px 0 6px; }
+.catcard-nums strong { font-size: 20px; font-variant-numeric: tabular-nums; }
+.catcard-nums span { color: var(--muted); font-size: 13px; }
+.catcard-meta { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+
 /* Goals */
 .goals { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .goal h2 { margin-bottom: 2px; }
 .goal-nums { display: flex; justify-content: space-between; align-items: baseline; margin: 10px 0 6px; }
-.goal-nums strong { font-size: 20px; }
+.goal-nums strong { font-size: 20px; font-variant-numeric: tabular-nums; }
 .goal-nums span { color: var(--muted); font-size: 14px; }
 .goal-left { font-size: 13px; color: var(--muted); margin: 6px 0 12px; }
 .goal-mini { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; padding: 8px 0; border-bottom: 1px solid #f0ebdd; align-items: center; }
@@ -169,10 +219,11 @@ tr.total td { border-top: 2px solid var(--line); }
   .top-in { padding-top: 10px; padding-bottom: 10px; }
   nav a { padding: 6px 7px; font-size: 13px; }
   .hero { padding-top: 20px; }
-  .cards { grid-template-columns: 1fr; }
+  .cards { grid-template-columns: 1fr 1fr; }
   .grid2 { grid-template-columns: 1fr; }
   .goals { grid-template-columns: 1fr; }
-  .card.sum strong { font-size: 23px; }
+  .catgrid { grid-template-columns: 1fr; }
+  .card.sum strong { font-size: 22px; }
   .card { overflow-x: auto; }
   table { min-width: 560px; }
   .card > table { margin: 0 -4px; }
