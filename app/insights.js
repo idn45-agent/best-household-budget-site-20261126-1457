@@ -1,13 +1,16 @@
 // Wawasan otomatis dari angka nyata: peringatan pagu, perbandingan bulan,
-// dan hal yang patut dirayakan. Semua teks dihitung dari state — bukan
-// kalimat tempelan — supaya selalu cocok dengan angka di layar.
+// arah tiga bulan, dan tagihan yang belum lunas. Semua teks dihitung dari
+// state — bukan kalimat tempelan — supaya selalu cocok dengan angka di layar.
 
 import { deltaPersen, deltaRupiah, persen, rupiah } from './format.js';
 import {
+  billRows,
+  billTotals,
   categoryRows,
   compareRows,
   monthSummary,
   topExpenses,
+  trendRows,
 } from './store.js';
 
 // Kategori yang melewati pagu bulan ini (untuk strip peringatan Dasbor).
@@ -72,7 +75,39 @@ export function buildInsights(month, state) {
     });
   }
 
-  // 5. Tingkat tabungan.
+  // 5. Arah tiga bulan: total pengeluaran Sep → Okt → Nov.
+  const trend = trendRows(state);
+  if (trend.length >= 3) {
+    const [a, b, c] = trend;
+    const d1 = b.expense - a.expense;
+    const d2 = c.expense - b.expense;
+    const dir = (x) => (x > 0 ? 'naik ' : x < 0 ? 'turun ' : 'tetap ');
+    out.push({
+      tone: d2 <= 0 ? 'good' : 'info',
+      text: 'Tiga bulan terakhir: ' + a.short + ' ' + rupiah(a.expense) + ', ' + b.short + ' ' +
+        dir(d1) + rupiah(Math.abs(d1)) + ', ' + c.short + ' ' + dir(d2) + rupiah(Math.abs(d2)) +
+        '. Pengeluaran ' + (d2 > 0 ? 'masih naik' : d2 < 0 ? 'mulai turun' : 'stabil') + '.',
+    });
+  }
+
+  // 6. Tagihan tetap yang belum lunas bulan ini.
+  const bills = billRows(state);
+  const bt = billTotals(bills);
+  if (bt.paidCount < bt.count) {
+    const unpaid = bills.filter((b) => !b.paid).map((b) => b.name).join(' dan ');
+    out.push({
+      tone: 'warn',
+      text: unpaid + ' belum lunas — ' + rupiah(bt.unpaidSum) + ' dari ' + rupiah(bt.total) +
+        ' tagihan tetap bulan ini. Cek halaman Tagihan.',
+    });
+  } else {
+    out.push({
+      tone: 'good',
+      text: 'Semua ' + bt.count + ' tagihan tetap bulan ini sudah lunas (' + rupiah(bt.total) + ').',
+    });
+  }
+
+  // 7. Tingkat tabungan.
   out.push({
     tone: s.savingsRate >= 0.3 ? 'good' : 'info',
     text: 'Sisa bulan ini ' + rupiah(s.rest) + ' — ' + persen(s.savingsRate) +
@@ -80,7 +115,7 @@ export function buildInsights(month, state) {
       rupiah(s.free) + '.',
   });
 
-  // 6. Pengeluaran terbesar bulan ini.
+  // 8. Pengeluaran terbesar bulan ini.
   const top = topExpenses(month, state, 1)[0];
   if (top) {
     const cat = rows.find((r) => r.id === top.cat);
@@ -91,7 +126,7 @@ export function buildInsights(month, state) {
     });
   }
 
-  // 7. Kategori terbesar pangsanya.
+  // 9. Kategori terbesar pangsanya.
   const biggest = rows[0];
   if (biggest) {
     out.push({

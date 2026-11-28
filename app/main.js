@@ -1,8 +1,9 @@
 // Titik masuk situs: router hash + semua aksi pengguna.
 // Rute: #/ dasbor, #/anggaran, #/transaksi, #/kategori (daftar),
-// #/kategori/<id> (rincian), #/tujuan, #/laporan.
+// #/kategori/<id> (rincian), #/tujuan, #/rencana, #/tagihan, #/laporan.
 // Aksi (delegasi klik/submit di document): ganti bulan, tambah/hapus transaksi,
-// simpan pagu, tambah dana tujuan, muat ulang data contoh.
+// simpan pagu, tambah dana tujuan, centang tagihan, simulasi tabungan,
+// muat ulang data contoh.
 
 import { CATEGORIES } from './data.js';
 import {
@@ -12,13 +13,17 @@ import {
   setCurrentMonth,
 } from './store.js';
 import {
+  afterBudget,
   afterDashboard,
   afterReport,
+  updateSimulation,
+  viewBills,
   viewBudget,
   viewCategories,
   viewCategory,
   viewDashboard,
   viewGoals,
+  viewPlanner,
   viewReport,
   viewTransactions,
 } from './views.js';
@@ -36,6 +41,7 @@ function route() {
     after = afterDashboard;
   } else if (parts[0] === 'anggaran') {
     html = viewBudget(state);
+    after = afterBudget;
   } else if (parts[0] === 'transaksi') {
     html = viewTransactions(state);
   } else if (parts[0] === 'kategori' && parts[1]) {
@@ -44,6 +50,10 @@ function route() {
     html = viewCategories(state);
   } else if (parts[0] === 'tujuan') {
     html = viewGoals(state);
+  } else if (parts[0] === 'rencana') {
+    html = viewPlanner(state);
+  } else if (parts[0] === 'tagihan') {
+    html = viewBills(state);
   } else if (parts[0] === 'laporan') {
     html = viewReport(state);
     after = afterReport;
@@ -69,7 +79,7 @@ function rerender() {
   route();
 }
 
-// --- Aksi: ganti bulan (tombol ‹ › di monthnav) ---
+// --- Aksi: ganti bulan (tombol ‹ › di monthnav, tetap di halaman yang sama) ---
 document.addEventListener('click', (e) => {
   const monthBtn = e.target.closest('[data-month]');
   if (monthBtn) {
@@ -99,13 +109,34 @@ document.addEventListener('click', (e) => {
     } else if (input) {
       input.focus();
     }
+  } else if (action === 'toggle-bill') {
+    // Checkbox tagihan: klik langsung mengubah status (change event di bawah
+    // yang menangani penyimpanan; klik di sini hanya mencegah rerender ganda).
   } else if (action === 'reset-data') {
     state = resetUserState();
     rerender();
   }
 });
 
-// --- Aksi: tambah transaksi + tambah dana tujuan (submit form) ---
+// --- Aksi: centang tagihan (change pada checkbox) ---
+document.addEventListener('change', (e) => {
+  const el = e.target;
+  if (el.matches('[data-action="toggle-bill"]')) {
+    const id = el.getAttribute('data-id');
+    state.bills[id] = el.checked;
+    saveUserState(state);
+    rerender();
+    return;
+  }
+  if (el.id === 'tx-filter') filterTransactions();
+  if (el.id === 'sim-amount' || el.id === 'sim-goal') updateSimulation(state);
+  if (el.name === 'kind' && el.form && el.form.id === 'add-tx') {
+    const cat = el.form.querySelector('select[name="cat"]');
+    if (cat) cat.disabled = el.value === 'in';
+  }
+});
+
+// --- Aksi: tambah transaksi + tambah dana tujuan + simulasi (submit form) ---
 document.addEventListener('submit', (e) => {
   const form = e.target;
   if (form.id === 'add-tx') {
@@ -142,20 +173,16 @@ document.addEventListener('submit', (e) => {
     state.goals[goalId] = (state.goals[goalId] || 0) + amount;
     saveUserState(state);
     rerender();
+  } else if (form.id === 'sim-form') {
+    e.preventDefault();
+    updateSimulation(state);
   }
 });
 
 // --- Filter daftar transaksi (ketik + pilih kategori) ---
 document.addEventListener('input', (e) => {
-  if (e.target.id !== 'tx-search' && e.target.id !== 'tx-filter') return;
-  filterTransactions();
-});
-document.addEventListener('change', (e) => {
-  if (e.target.id === 'tx-filter') filterTransactions();
-  if (e.target.name === 'kind' && e.target.form && e.target.form.id === 'add-tx') {
-    const cat = e.target.form.querySelector('select[name="cat"]');
-    if (cat) cat.disabled = e.target.value === 'in';
-  }
+  if (e.target.id === 'tx-search' || e.target.id === 'tx-filter') filterTransactions();
+  if (e.target.id === 'sim-amount') updateSimulation(state);
 });
 
 function filterTransactions() {
